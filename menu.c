@@ -4,6 +4,7 @@ int main( void )
 {
 	char mon[3],day[3],hour[3],min[3],store[64];
 	char item[20][128];
+	int i, cnt, cnt2, money[20];
 	
 	printf( "月？>>>" );
 	gets( mon );
@@ -16,13 +17,30 @@ int main( void )
 	printf( "お店の名前は？>>>" );
 	gets( store );
 	/* 商品名をループで入力 */
+	printf( "購入した商品の数は？");
+	scanf("%d", &cnt);
+	cnt2 = cnt;
+
+	for( i = 0 ; cnt != 0 ; i++)
+	{
+		printf( "商品名は？　いくらだった？>>>");
+		gets( item[i]);
+		cnt--;
+	}
 	
 	printf( "あなたの入力した文字は\n" );
 	printf( "%s月%s日\n", mon,&day );
 	printf( "　　%s時%s分\n", &hour, &min);
 	printf( "\t%s\n", &store );
-	/*　商品名をループで表示 */
+	for( i = 0; cnt2 != 0; i++)
+	{
+		printf( "\t\t%s\n", item[i]);
+		cnt2--;
+	}
+	return 0;
+}
 	
+	/*　商品名をループで表示 */
 	/* dentaku.c */
 
 // #include <stdio.h>
@@ -94,5 +112,3 @@ int main( void )
 // 	}
 // 	return 0;
 // }
-	return 0;
-}
