@@ -1,70 +1,62 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h>//キーボード入力、画面出力のため
+#include <stdlib.h>//EXIT_SUCCESS マクロのため
+#include <string.h>//strlen()関数のため
 
+/*
+	項目　金額　残高
+	の収支のテキストファイルを作る
+	プログラム
+*/
 int main (void)
 {
 	#define STRING_MAX 256
+	
 	// 変数宣言
 	int sum = 0 ; // 残高初期値に0を代入
-	char value[10]; //　商品の値段を代入 支出のときのみマイナス判定をするため文字列
-	int data; //文字列valueを数字にしたデータを格納
+	char sum1[STRING_MAX];// 既存のファイルの最後の残高の文字列を格納する
+	int value; //　日本語全角には対応できない、商品の値段を代入 支出のときのみマイナス判定をするため
+			   //unsignedをつけてないためマイナス扱える
+	char string[STRING_MAX]; //データを追加する前にそれ以前のデータの残高を算出
 	char item[STRING_MAX]; // 商品名
-	char Filename[FILENAME_MAX]; //FILENAME_MAXはその処理系で扱える最大文字数のファイル名をC言語でマクロ定義している
-	FILE*fp;
+	char Filename[STRING_MAX];// スラッシュを使ったファイル名を入力してもファイルは作成されない
+								//アンダーバーならOK
+	int i;
+	FILE* fp;
 	
-	// フィアル名の入力
-	printf("これから扱うファイル名を入力してください>>");
-	scanf ( "%s", Filename);
-	//　ファイルオープン（ファイルの追加出力モード）、ファイル作成
-	if ( (fp = fopen(Filename, "w" )) == NULL )
+	//ファイル名入力
+	printf( "ファイル名を入力してください>>>");
+	scanf( "%s", &Filename);
+	
+	//既存のファイルが存在した場合最後の行の残高をsumに代入
+	fp = fopen( Filename, "r");
+	while( fgets(string, STRING_MAX, fp ))
 	{
-		printf( "ファイルが作成できませんでした\n");
-		printf( "プログラムを終了します。\n");
-		exit ( EXIT_FAILURE );
+		sscanf(string, "%*s %*s %s", &sum1); 
+		sum = atoi( sum1);
 	}
-	// ファイルの終端か確認
-      // この処理は後回し
-	// ファイルがなかったら ファイル名を入力して新規作成
-	　　// この処理は後回し
-	// 残高の入力
-	printf (" 残高を入力してください\n ");
-	fgets( value, 9, stdin);
-	value[(strlen(value)-1)] = '\0';
-	data = atoi(value);
-	fprintf(fp, "残高\t\t%d\n", value);
-	// 商品名入力
-	printf( "商品名を入力してください。\n");
-	fgets(item,STRING_MAX,stdin);
-	item[(strlen(item)-1)] = '\0';
-	// 値段入力
-	printf( "値段を入力してください\n");
-	printf( "支出の場合は数字の前に'-'（マイナス符号）をつけてください\n"）;
-	printf( "例；　-300000);
-	fgets( value, 10, stdin);
-	// もし値段の最初に-または－（全角半角のマイナス）がついていたら引き算
-	if ( value[0] == '-')
+	fclose( fp );
+	
+	//　ファイルにデータを追加する処理
+	fp = fopen( Filename, "a");
+	do
 	{
-		for( i = 0; i <= 9; i++)
+		printf( "項目を入力してくだい\n");
+		scanf( "%s", &item );
+		// 項目入力のときに半角数字の0を入力すると正常終了
+		if( item[0] == '0' )
 		{
-			value[i] = value[i+1];
+			fclose( fp );
+			printf( "プログラムを終了します\n");
+			break;
 		}
-		data = atoi(value);
-		sum -= data;
-	} else //　それ以外は足し算
-	{
-		data = atoi(value);
+		printf( "値段を半角数字で入力してください。支出の場合は-マイナス記号を数字の前につけてください\n");
+		scanf( "%d", &value);
 		sum += value;
-	}
-	//　商品名と値段と残高表示
-	printf(fp,"%s\t\t%d\n"item, data)
-	//　ファイル出力
-	fprintf(fp,"%s\t\t%d\n"item, data)
-	// もし商品名に０（全角または半角が入力されたらループを抜ける
-	　　//あとで処理
-	//　もしEOFまたはエラーで返ってきた場合は
-	　　//あとで処理
-	//　新しいファイルを作るエラーメッセージ
-	　　//あとで処理
-	fclose(fp);
-	return EXIT_SUCCESS
+		// 項目は全角なら１０文字半角なら20文字,金額・残高は１０文字半角文字で整形
+		fprintf(fp, " %20s\t\t\t\t%10d\t\t\t\t%10d\n", item, value, sum);
+		printf( "Debug : %20s\t\t%10d\t%10d\n", item, value, sum);
+	}while( 1 );
+	fclose( fp );
+	
+	return EXIT_SUCCESS;
 }
