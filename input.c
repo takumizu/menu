@@ -18,17 +18,31 @@ int main (void)
 			   //unsignedをつけてないためマイナス扱える
 	char string[STRING_MAX]; //データを追加する前にそれ以前のデータの残高を算出
 	char item[STRING_MAX]; // 商品名
-	char Filename[STRING_MAX];// スラッシュを使ったファイル名を入力してもファイルは作成されない
-								//アンダーバーならOK
+	char Filename[STRING_MAX]; // ファイル名を初期化
+							   // WindowsOSでファイル名の文字都市使えない文字を使ったファイル名を入力してもファイルは作成されない
+							   // アンダーバーならOK
 	int i;
 	FILE* fp;
 	
 	//ファイル名入力
-	printf( "ファイル名を入力してください>>>");
-	scanf( "%s", &Filename);
+	// printf( "ファイル名を入力してください>>>");
+	// scanf( "%s", &Filename);
+
+	/* 毎回ファイル名を入力するのは面倒なので
+	　　 月に1回ファイル名を固定にする
+		以下はコンパイルエラーとなる
+	char Filename[STRING_MAX];
 	
+	Filename[STRING_MAX] = "2018_09.txt";
+	これはFilename[255]に
+	*/
+	strcpy( Filename, "2018_09.txt");
 	//既存のファイルが存在した場合最後の行の残高をsumに代入
+	// ファイルを読み込みモードでオープン
 	fp = fopen( Filename, "r");
+	// fgets 戻り値 ファイルポインタfpから一行またはSTRING_MAXバイト読み込んで
+	// その先頭アドレスを返す
+	// ファイルの終端、またはエラー時にはNULL（\0)を返す
 	while( fgets(string, STRING_MAX, fp ))
 	{
 		sscanf(string, "%*s %*s %s", &sum1); 
@@ -40,7 +54,7 @@ int main (void)
 	fp = fopen( Filename, "a");
 	do
 	{
-		printf( "項目を入力してくだい\n");
+		printf( "項目を入力してくだい >>> ");
 		scanf( "%s", &item );
 		// 項目入力のときに半角数字の0を入力すると正常終了
 		if( item[0] == '0' )
@@ -49,11 +63,11 @@ int main (void)
 			printf( "プログラムを終了します\n");
 			break;
 		}
-		printf( "値段を半角数字で入力してください。支出の場合は-マイナス記号を数字の前につけてください\n");
+		printf( "金額を入力してください>>> ");
 		scanf( "%d", &value);
 		sum += value;
 		// 項目は全角なら１０文字半角なら20文字,金額・残高は１０文字半角文字で整形
-		fprintf(fp, " %20s\t\t\t\t%10d\t\t\t\t%10d\n", item, value, sum);
+		fprintf(fp, " %-20s\t\t\t\t%10d\t\t\t\t%10d\n", item, value, sum);
 		printf( "Debug : %20s\t\t%10d\t%10d\n", item, value, sum);
 	}while( 1 );
 	fclose( fp );
